@@ -319,7 +319,7 @@ n_str n_read_file(const char *file_name)
     if (!f)
     {
 #ifndef N_RELEASE
-        fprintf(stderr, "n_read_file: Failed to read file '%s'", file_name);
+        fprintf(stderr, "n_read_file: Failed to read file '%s'\n", file_name);
 #endif
         goto file_fail;
     }
@@ -330,12 +330,17 @@ n_str n_read_file(const char *file_name)
     if (!buff)
     {
 #ifndef N_RELEASE
-        perror("n_read_file: Failed to allocate memory for file's string.");
+        perror("n_read_file: Failed to allocate memory for file's string.\n");
 #endif
         fclose(f);
         return ret;
     }
-    fread(buff, sizeof(char), i, f);
+    if (0 == fread(buff, sizeof(char), i, f) && i)
+    {
+#ifndef N_RELEASE
+        fprintf(stderr, "n_read_file: Failed to read file '%s'\n", file_name);
+#endif
+    }
     buff[i] = 0;
     ret = (n_str){buff, i};
 
